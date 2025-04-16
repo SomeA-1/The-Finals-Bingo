@@ -15,27 +15,27 @@
       padding: 20px;
     }
     .board {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  max-width: 600px;
-  margin: 0 auto;
-  width: 100%;
-}
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      max-width: 600px;
+      margin: 0 auto;
+      width: 100%;
+    }
     .board button {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  aspect-ratio: 1 / 1;
-  width: 100%;
-  font-family: inherit;
-  padding: 10px;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-}
+      background-color: #333;
+      color: #fff;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      font-family: inherit;
+      padding: 10px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
     .board button:hover {
       background-color: #555;
     }
@@ -51,6 +51,13 @@
       font-size: 1.5em;
       color: lightgreen;
     }
+    #bingoLabel {
+      text-align: center;
+      font-size: 2em;
+      color: gold;
+      margin-top: 20px;
+      display: none; /* Initially hidden */
+    }
     .version {
       position: fixed;
       bottom: 10px;
@@ -60,11 +67,10 @@
   </style>
 </head>
 <body>
-    <div style="text-align: center; margin-top: 20px;">
-        <button id="randomizeBtn" style="padding: 10px 20px; font-size: 14px;">🔄 Randomize Board</button>
-        <div id="timestamp" style="margin-top: 5px; color: #888; font-size: 12px;"></div>
-      </div>
-
+  <div style="text-align: center; margin-top: 20px;">
+    <button id="randomizeBtn" style="padding: 10px 20px; font-size: 14px;">🔄 Randomize Board</button>
+    <div id="timestamp" style="margin-top: 5px; color: #888; font-size: 12px;"></div>
+  </div>
 
   <div class="name-section">
     <div id="nameInputArea">
@@ -75,13 +81,13 @@
     <div id="nameLabel"></div>
   </div>
 
+  <!-- Bingo Label -->
+  <div id="bingoLabel">Bingo!</div>
+
   <div class="board" id="bingoBoard">
     <!-- Bingo buttons will be inserted here by JavaScript -->
   </div>
 
-
   <script src="script.js"></script>
-
-
 </body>
 </html>

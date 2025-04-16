@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <div class="version">Version 1.0</div>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bingo Board</title>
@@ -77,72 +78,8 @@
     <!-- Bingo buttons will be inserted here by JavaScript -->
   </div>
 
-  <div class="version">Version 1.0</div>
 
-  <script>
-    const originalEntries = {{ bingo_entries | tojson }};
-    const bingoBoard = document.getElementById('bingoBoard');
-    const saveNameBtn = document.getElementById('saveNameBtn');
-    const nameLabel = document.getElementById('nameLabel');
-    const nameInputArea = document.getElementById('nameInputArea');
-    const randomizeBtn = document.getElementById('randomizeBtn');
-    const timestampLabel = document.getElementById('timestamp');
-
-    function shuffle(array) {
-      const newArr = array.slice(); // copy
-      for (let i = newArr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-      }
-      return newArr;
-    }
-
-    function generateBoard(entries) {
-      const shuffled = shuffle(entries);
-
-      const boardEntries = [...shuffled.slice(0, 12), "Free Space \n (You experience a bug)", ...shuffled.slice(12, 24)];
-      bingoBoard.innerHTML = ''; // clear previous board
-      boardEntries.forEach(entry => {
-        const button = document.createElement('button');
-        button.textContent = entry;
-        button.onclick = () => button.classList.toggle('active');
-        bingoBoard.appendChild(button);
-      });
-
-      const now = new Date();
-      timestampLabel.textContent = `Last generated: ${now.toLocaleString()}`;
-    }
-
-    // Initial generation
-    generateBoard(originalEntries);
-
-    randomizeBtn.onclick = () => generateBoard(originalEntries);
-
-    saveNameBtn.onclick = () => {
-      const name = document.getElementById('nameInput').value.trim();
-      if (name) {
-        fetch('/save_name', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `name=${name}`
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === 'success') {
-            nameInputArea.style.display = 'none';
-            nameLabel.textContent = `${data.name}'s Bingo Board`;
-            nameLabel.style.color = 'lightgreen';
-          } else {
-            nameLabel.textContent = data.message;
-            nameLabel.style.color = 'red';
-          }
-        });
-      } else {
-        nameLabel.textContent = 'Please enter a name.';
-        nameLabel.style.color = 'red';
-      }
-    };
-  </script>
+  <script src="script.js"></script>
 
 
 </body>

@@ -15,20 +15,36 @@ function shuffle(array) {
 }
 
 function generateBoard(entries) {
-  const shuffled = shuffle(entries);
-  const boardEntries = [...shuffled.slice(0, 12), "Free Space", ...shuffled.slice(12, 24)];
-
-  bingoBoard.innerHTML = '';
-  boardEntries.forEach(entry => {
-    const button = document.createElement('button');
-    button.textContent = entry;
-    button.onclick = () => button.classList.toggle('active');
-    bingoBoard.appendChild(button);
-  });
-
-  const now = new Date();
-  timestampLabel.textContent = `Last generated: ${now.toLocaleString()}`;
-}
+    const shuffled = shuffle(entries);
+    const boardEntries = [...shuffled.slice(0, 12), "Free Space", ...shuffled.slice(12, 24)];
+  
+    bingoBoard.innerHTML = '';
+    boardEntries.forEach(entry => {
+      const button = document.createElement('button');
+      button.textContent = entry;
+      button.dataset.clickCount = 0; // Initialize click count
+  
+      button.onclick = () => {
+        let clickCount = parseInt(button.dataset.clickCount, 10);
+  
+        if (clickCount === 0) {
+          // First click: turn green
+          button.classList.add('active');
+        } else {
+          // Subsequent clicks: display increasing digit
+          button.textContent = clickCount;
+        }
+  
+        // Increment and store the click count
+        button.dataset.clickCount = clickCount + 1;
+      };
+  
+      bingoBoard.appendChild(button);
+    });
+  
+    const now = new Date();
+    timestampLabel.textContent = `Last generated: ${now.toLocaleString()}`;
+  }
 
 function loadEntriesAndGenerate() {
   fetch('entries.json')

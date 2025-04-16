@@ -136,4 +136,11 @@ saveNameBtn.onclick = () => {
   }
 };
 
+// Trigger saveNameBtn click when "Enter" is pressed in the name input field
+document.getElementById('nameInput').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    saveNameBtn.click(); // Trigger the saveNameBtn click event
+  }
+});
+
 loadEntriesAndGenerate();

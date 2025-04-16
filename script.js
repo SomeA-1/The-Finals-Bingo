@@ -24,20 +24,41 @@ function generateBoard(entries) {
       button.textContent = entry;
       button.dataset.clickCount = 0; // Initialize click count
   
-      button.onclick = () => {
+      // Create a small counter element
+      const counter = document.createElement('span');
+      counter.style.position = 'absolute';
+      counter.style.bottom = '5px';
+      counter.style.right = '5px';
+      counter.style.fontSize = '12px';
+      counter.style.color = '#fff';
+      counter.textContent = ''; // Initially empty
+      button.style.position = 'relative'; // Ensure the counter is positioned relative to the button
+      button.appendChild(counter);
+  
+      button.onmousedown = (event) => {
         let clickCount = parseInt(button.dataset.clickCount, 10);
   
-        if (clickCount === 0) {
-          // First click: turn green
-          button.classList.add('active');
-        } else {
-          // Subsequent clicks: display increasing digit
-          button.textContent = clickCount;
+        if (event.button === 0) {
+          // Left click: increment the counter
+          if (clickCount === 0) {
+            button.classList.add('active'); // First click: turn green
+          }
+          button.dataset.clickCount = clickCount + 1;
+          counter.textContent = clickCount + 1;
+        } else if (event.button === 2) {
+          // Right click: decrement the counter
+          if (clickCount > 0) {
+            button.dataset.clickCount = clickCount - 1;
+            counter.textContent = clickCount - 1 || ''; // Clear counter if it reaches 0
+            if (clickCount - 1 === 0) {
+              button.classList.remove('active'); // Remove green background when inactive
+            }
+          }
         }
-  
-        // Increment and store the click count
-        button.dataset.clickCount = clickCount + 1;
       };
+  
+      // Prevent the context menu from appearing on right-click
+      button.oncontextmenu = (event) => event.preventDefault();
   
       bingoBoard.appendChild(button);
     });

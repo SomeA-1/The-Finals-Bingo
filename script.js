@@ -97,7 +97,8 @@ function generateBoard(entries, freeSpaceEntry) {
   });
 
   const now = new Date();
-  timestampLabel.textContent = `Last generated: ${now.toLocaleString()}`;
+  const options = { timeZone: 'Europe/Paris', hour12: false }; // GMT+1 timezone
+  timestampLabel.textContent = `Last generated: ${now.toLocaleString('en-GB', options)}`;
   console.log(`Timestamp updated: ${timestampLabel.textContent}`);
 }
 

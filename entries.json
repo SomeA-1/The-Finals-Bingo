@@ -15,6 +15,7 @@
     "Game crash",
     "Die while reviving",
     "Kill within 3 seconds of spawning",
+    "Death within 3 seconds of spawning",
     "Jinko complains about a game mechanic",
     "Getting killed \"behind a wall\"",
     "Got Qsniped",
@@ -44,6 +45,8 @@
     "Big content creator in chat",
     "Jinko gets Raided",
     "Someone Gifted a sub!",
-    "Melee weapon doesn't register"
+    "Melee weapon doesn't register",
+    "Dog Walk",
+    "Jinko forgot to unmute"
   ]
   

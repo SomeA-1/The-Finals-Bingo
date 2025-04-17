@@ -5,6 +5,28 @@ const nameInputArea = document.getElementById('nameInputArea');
 const randomizeBtn = document.getElementById('randomizeBtn');
 const timestampLabel = document.getElementById('timestamp');
 const bingoLabel = document.getElementById('bingoLabel'); // Bingo label element
+const toggleSoundBtn = document.getElementById('toggleSoundBtn'); // Sound toggle button
+
+const sidebar = document.getElementById('sidebar');
+const openSidebarBtn = document.getElementById('openSidebarBtn');
+const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+// Open the sidebar
+openSidebarBtn.onclick = () => {
+  sidebar.classList.add('open');
+};
+
+// Close the sidebar
+closeSidebarBtn.onclick = () => {
+  sidebar.classList.remove('open');
+};
+
+// Load sound files
+const checkSound = new Audio('sounds/check.mp3'); // Sound for checking
+const uncheckSound = new Audio('sounds/uncheck.mp3'); // Sound for unchecking
+const confettiSound = new Audio('sounds/confetti.mp3'); // Sound for confetti
+
+let soundsEnabled = true; // Variable to track if sounds are enabled
 
 function shuffle(array) {
   const newArr = array.slice();
@@ -44,6 +66,7 @@ function generateBoard(entries, freeSpaceEntry) {
         // Left click: increment the counter
         if (clickCount === 0) {
           button.classList.add('active'); // First click: turn green
+          if (soundsEnabled) checkSound.play(); // Play check sound if enabled
         }
         button.dataset.clickCount = clickCount + 1;
         counter.textContent = clickCount + 1;
@@ -54,6 +77,7 @@ function generateBoard(entries, freeSpaceEntry) {
           counter.textContent = clickCount - 1 || ''; // Clear counter if it reaches 0
           if (clickCount - 1 === 0) {
             button.classList.remove('active'); // Remove green background when inactive
+            if (soundsEnabled) uncheckSound.play(); // Play uncheck sound if enabled
           }
         }
       }
@@ -74,6 +98,7 @@ function generateBoard(entries, freeSpaceEntry) {
 
   const now = new Date();
   timestampLabel.textContent = `Last generated: ${now.toLocaleString()}`;
+  console.log(`Timestamp updated: ${timestampLabel.textContent}`);
 }
 
 let previousBingoCount = 0; // Track the previous bingo count
@@ -127,6 +152,7 @@ function checkBingo() {
   // Trigger confetti only if the bingo count increases
   if (bingoCount > previousBingoCount) {
     launchConfetti();
+    if (soundsEnabled) confettiSound.play(); // Play confetti sound if enabled
   }
 
   // Update the previous bingo count
@@ -196,5 +222,11 @@ document.getElementById('nameInput').addEventListener('keydown', (event) => {
     saveNameBtn.click(); // Trigger the saveNameBtn click event
   }
 });
+
+toggleSoundBtn.onclick = () => {
+  soundsEnabled = !soundsEnabled; // Toggle the soundsEnabled variable
+  console.log(`Sounds Enabled: ${soundsEnabled}`); // Debugging
+  toggleSoundBtn.textContent = soundsEnabled ? "🔊 Disable Sounds" : "🔇 Enable Sounds"; // Update button text
+};
 
 loadEntriesAndGenerate();

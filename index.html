@@ -64,15 +64,57 @@
       right: 10px;
       font-size: 12px;
     }
+    #sidebar {
+      transform: translateX(-100%); /* Initially hidden */
+      transition: transform 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #2e2e2e;
+      color: #fff;
+      padding: 20px;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+      z-index: 2000; /* Ensure the sidebar is above other elements */
+    }
+    #sidebar.open {
+      transform: translateX(0); /* Slide in when open */
+    }
+    #openSidebarBtn {
+      background-color: #2e2e2e;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      font-size: 14px;
+      z-index: 1000; /* Ensure the button is below the sidebar */
+    }
+    #openSidebarBtn:hover {
+      background-color: #444;
+    }
   </style>
 </head>
 <body>
-  <div style="text-align: center; margin-top: 20px;">
-    <button id="randomizeBtn" style="padding: 10px 20px; font-size: 14px;">🔄 Randomize Board</button>
-    <div id="timestamp" style="margin-top: 5px; color: #888; font-size: 12px;"></div>
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <button id="closeSidebarBtn" style="margin-bottom: 20px; padding: 10px 20px; font-size: 14px;">❌ Close Sidebar</button>
+    <button id="randomizeBtn" style="padding: 10px 20px; font-size: 14px; width: 100%;">🔄 Randomize Board</button>
+    <button id="toggleSoundBtn" style="padding: 10px 20px; font-size: 14px; width: 100%; margin-top: 10px;">🔊 Disable Sounds</button>
   </div>
 
+  <!-- Open Sidebar Button -->
+  <button id="openSidebarBtn">☰ Open Sidebar</button>
+
+  <!-- Bingo Label -->
+  <div id="bingoLabel">Bingo!</div>
+
+  <!-- Name Input Area -->
   <div class="name-section">
+    <div id="timestamp" style="margin-bottom: 10px; color: #888; font-size: 12px;">Timestamp will appear here</div>
     <div id="nameInputArea">
       <h1>Enter your name:</h1>
       <input type="text" id="nameInput" placeholder="Enter name" />
@@ -81,14 +123,12 @@
     <div id="nameLabel"></div>
   </div>
 
-  <!-- Bingo Label -->
-  <div id="bingoLabel">Bingo!</div>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+  <!-- Bingo Board -->
   <div class="board" id="bingoBoard">
     <!-- Bingo buttons will be inserted here by JavaScript -->
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

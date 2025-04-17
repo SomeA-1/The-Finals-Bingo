@@ -76,26 +76,80 @@ function generateBoard(entries, freeSpaceEntry) {
   timestampLabel.textContent = `Last generated: ${now.toLocaleString()}`;
 }
 
+let previousBingoCount = 0; // Track the previous bingo count
+
 function checkBingo() {
   const buttons = Array.from(bingoBoard.children);
   const grid = [];
   while (buttons.length) grid.push(buttons.splice(0, 5));
 
+  let bingoCount = 0;
+
   // Check rows
   for (const row of grid) {
-    if (row.every(button => button.classList.contains('active'))) return true;
+    if (row.every(button => button.classList.contains('active'))) {
+      bingoCount++;
+    }
   }
 
   // Check columns
   for (let col = 0; col < 5; col++) {
-    if (grid.every(row => row[col].classList.contains('active'))) return true;
+    if (grid.every(row => row[col].classList.contains('active'))) {
+      bingoCount++;
+    }
   }
 
   // Check diagonals
-  if (grid.every((row, i) => row[i].classList.contains('active'))) return true;
-  if (grid.every((row, i) => row[4 - i].classList.contains('active'))) return true;
+  if (grid.every((row, i) => row[i].classList.contains('active'))) {
+    bingoCount++;
+  }
+  if (grid.every((row, i) => row[4 - i].classList.contains('active'))) {
+    bingoCount++;
+  }
 
-  return false;
+  // Update the Bingo label based on the count
+  if (bingoCount === 1) {
+    bingoLabel.textContent = "Bingo!";
+    bingoLabel.style.display = "block";
+  } else if (bingoCount === 2) {
+    bingoLabel.textContent = "Double Bingo!";
+    bingoLabel.style.display = "block";
+  } else if (bingoCount === 3) {
+    bingoLabel.textContent = "Triple Bingo!";
+    bingoLabel.style.display = "block";
+  } else if (bingoCount > 3) {
+    bingoLabel.textContent = `${bingoCount} Bingos!`;
+    bingoLabel.style.display = "block";
+  } else {
+    bingoLabel.style.display = "none"; // Hide the label if no bingos
+  }
+
+  // Trigger confetti only if the bingo count increases
+  if (bingoCount > previousBingoCount) {
+    launchConfetti();
+  }
+
+  // Update the previous bingo count
+  previousBingoCount = bingoCount;
+
+  return bingoCount > 0; // Return true if at least one bingo is detected
+}
+
+function launchConfetti() {
+  console.log("Confetti triggered!"); // Debugging
+  confetti({
+    particleCount: 500,
+    spread: 180,
+    gravity: 0.3,
+    scalar: 1.5,
+    ticks: 1000,
+    startVelocity: 60,
+    origin: {
+      x: 0.5,
+      // since they fall down, start a bit higher than random
+      y: 1,
+    }
+  });
 }
 
 function loadEntriesAndGenerate() {

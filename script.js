@@ -3,6 +3,7 @@ const saveNameBtn = document.getElementById('saveNameBtn');
 const nameLabel = document.getElementById('nameLabel');
 const nameInputArea = document.getElementById('nameInputArea');
 const randomizeBtn = document.getElementById('randomizeBtn');
+const privPolicyBtn = document.getElementById('privPolicyBtn');
 const timestampLabel = document.getElementById('timestamp');
 const bingoLabel = document.getElementById('bingoLabel'); // Bingo label element
 const toggleSoundBtn = document.getElementById('toggleSoundBtn'); // Sound toggle button
@@ -26,7 +27,7 @@ const checkSound = new Audio('sounds/check.mp3'); // Sound for checking
 const uncheckSound = new Audio('sounds/uncheck.mp3'); // Sound for unchecking
 const confettiSound = new Audio('sounds/confetti.mp3'); // Sound for confetti
 
-let soundsEnabled = true; // Variable to track if sounds are enabled
+let soundsEnabled = false; // Variable to track if sounds are enabled
 
 function shuffle(array) {
   const newArr = array.slice();
@@ -208,8 +209,8 @@ function loadEntriesAndGenerate() {
 saveNameBtn.onclick = () => {
   const name = document.getElementById('nameInput').value.trim();
   if (name) {
-    nameInputArea.style.display = 'none';
-    nameLabel.textContent = `${name}'s Bingo Board`;
+    nameInputArea.style.display = 'none'; // Hide the input field and button
+    nameLabel.textContent = `${name}'s Bingo Board`; // Update the name label
     nameLabel.style.color = 'lightgreen';
   } else {
     nameLabel.textContent = 'Please enter a name.';
@@ -228,6 +229,11 @@ toggleSoundBtn.onclick = () => {
   soundsEnabled = !soundsEnabled; // Toggle the soundsEnabled variable
   console.log(`Sounds Enabled: ${soundsEnabled}`); // Debugging
   toggleSoundBtn.textContent = soundsEnabled ? "🔊 Disable Sounds" : "🔇 Enable Sounds"; // Update button text
+};
+//open privacy policy in a new tab
+privPolicyBtn.onclick = () => {
+  window.open('privacypolicy.html', '_blank'); // Open privacy policy in a new tab
+  console.log("Privacy policy opened"); // Debugging
 };
 
 loadEntriesAndGenerate();

@@ -236,4 +236,7 @@ privPolicyBtn.onclick = () => {
   console.log("Privacy policy opened"); // Debugging
 };
 
+PlugBtn.onclick = () => {
+  window.open('https://www.twitch.tv/aonettv', '_blank'); // Open Twitch channel in a new tab
+}
 loadEntriesAndGenerate();

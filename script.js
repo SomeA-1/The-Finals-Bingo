@@ -54,7 +54,7 @@ function generateBoard(entries, freeSpaceEntry) {
     counter.style.position = 'absolute';
     counter.style.bottom = '5px';
     counter.style.right = '5px';
-    counter.style.fontSize = '12px';
+    counter.style.fontSize = '25px';
     counter.style.color = '#fff';
     counter.textContent = ''; // Initially empty
     button.style.position = 'relative'; // Ensure the counter is positioned relative to the button

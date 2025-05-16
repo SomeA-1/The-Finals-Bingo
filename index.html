@@ -26,12 +26,16 @@
 
     .board {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); /* Flexible grid for smaller screens */
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
       gap: 5px;
       width: 100%;
       max-width: 90vmin;
       height: auto;
       max-height: 90vmin;
+      background: #23272e;           /* Subtle dark background */
+      border: 3px solid #23272e;        /* Slightly lighter border */
+      border-radius: 16px;           /* Rounded corners */
+      padding: 20px;                 /* Space inside the board */
     }
 
     .board button {

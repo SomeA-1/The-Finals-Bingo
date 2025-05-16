@@ -18,6 +18,7 @@
       justify-content: center;
       height: 100vh;
       overflow: hidden;
+      cursor: none !important; /* Hide the system cursor */
     }
 
     .board {
@@ -127,6 +128,17 @@
       border-radius: 5px;
     }
 
+    #customCursor {
+      position: fixed;
+      width: 32px;
+      height: 32px;
+      background: url('images/olivecursor.png') center center no-repeat;
+      background-size: contain;
+      pointer-events: none;
+      transform: translate(-40%, -20%);
+      z-index: 9999;
+    }
+
     /* Media Queries for Smaller Screens */
     @media (max-width: 768px) {
       body {
@@ -173,7 +185,7 @@
     <button id="randomizeBtn">🔄 Randomize Board</button>
     <button id="toggleSoundBtn">🔇 Enable Sounds</button>
     <button id="privPolicyBtn">🔒 Privacy Policy</button>
-    <button id="PlugBtn">Follow Me on Twitch</button>
+    <button id="PlugBtn">Follow A-1 on Twitch</button>
   </div>
   
   <!-- Open Sidebar Button -->
@@ -198,6 +210,15 @@
     <!-- Bingo buttons will be inserted here by JavaScript -->
   </div>
 
+  <div id="customCursor"></div>
+  <script>
+    document.addEventListener('mousemove', (e) => {
+      const customCursor = document.getElementById('customCursor');
+      customCursor.style.left = e.clientX + 'px';
+      customCursor.style.top = e.clientY + 'px';
+      customCursor.style.display = 'block';
+    });
+  </script>
   <script src="confetti.browser.min.js"></script>
   <script src="script.js"></script>
 </body>

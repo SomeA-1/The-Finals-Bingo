@@ -11,6 +11,22 @@ const toggleSoundBtn = document.getElementById('toggleSoundBtn'); // Sound toggl
 const sidebar = document.getElementById('sidebar');
 const openSidebarBtn = document.getElementById('openSidebarBtn');
 const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+const customCursor = document.getElementById('customCursor');
+
+// Custom cursor functionality
+document.addEventListener('DOMContentLoaded', () => {
+  customCursor.style.display = 'block'; // Show the custom cursor on page load
+});
+document.addEventListener('mousemove', (e) => {
+  const customCursor = document.getElementById('customCursor');
+  if (customCursor) {
+    customCursor.style.left = e.clientX + 'px';
+    customCursor.style.top = e.clientY + 'px';
+    customCursor.style.display = 'block';
+  }
+});
+
+
 
 // Open the sidebar
 openSidebarBtn.onclick = () => {

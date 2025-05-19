@@ -26,8 +26,6 @@ document.addEventListener('mousemove', (e) => {
   }
 });
 
-
-
 // Open the sidebar
 openSidebarBtn.onclick = () => {
   sidebar.classList.add('open');
@@ -54,8 +52,39 @@ function shuffle(array) {
   return newArr;
 }
 
-function generateBoard(entries, freeSpaceEntry) {
-  const shuffled = shuffle(entries);
+// Add a label to display the seed (add this to your HTML as well)
+const seedLabel = document.getElementById('seedLabel');
+
+// Seeded random number generator (simple implementation)
+function mulberry32(seed) {
+  let t = seed;
+  return function() {
+    t += 0x6D2B79F5;
+    let r = Math.imul(t ^ t >>> 15, 1 | t);
+    r ^= r + Math.imul(r ^ r >>> 7, 61 | r);
+    return ((r ^ r >>> 14) >>> 0) / 4294967296;
+  }
+}
+
+// Seeded shuffle
+function seededShuffle(array, seed) {
+  const rng = mulberry32(seed);
+  const newArr = array.slice();
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
+// Generate a random seed (6-digit number)
+function generateSeed() {
+  return Math.floor(100000 + Math.random() * 900000);
+}
+
+// Modified generateBoard to accept a seed
+function generateBoard(entries, freeSpaceEntry, seed) {
+  const shuffled = seededShuffle(entries, seed);
   const boardEntries = [...shuffled.slice(0, 12), freeSpaceEntry, ...shuffled.slice(12, 24)];
 
   bingoBoard.innerHTML = '';
@@ -105,6 +134,9 @@ function generateBoard(entries, freeSpaceEntry) {
       } else {
         bingoLabel.style.display = 'none'; // Hide the Bingo label
       }
+
+      // After updating button state:
+      saveBoardState();
     };
 
     // Prevent the context menu from appearing on right-click
@@ -117,6 +149,13 @@ function generateBoard(entries, freeSpaceEntry) {
   const options = { timeZone: 'Europe/Paris', hour12: false }; // GMT+1 timezone
   timestampLabel.textContent = `Last generated: ${now.toLocaleString('en-GB', options)}`;
   console.log(`Timestamp updated: ${timestampLabel.textContent}`);
+
+  // Display the seed
+  if (seedLabel) {
+    seedLabel.textContent = `Seed: ${seed}`;
+  }
+
+  loadBoardState();
 }
 
 let previousBingoCount = 0; // Track the previous bingo count
@@ -211,10 +250,25 @@ function loadEntriesAndGenerate() {
         return;
       }
 
-      const freeSpaceEntry = shuffle(freeSpaces)[0]; // Pick a random free space entry
-      generateBoard(entries, freeSpaceEntry);
+      let seed = loadSeed();
+      if (!seed) {
+        seed = generateSeed();
+        saveSeed(seed);
+      }
+      const freeSpaceEntry = seededShuffle(freeSpaces, seed)[0];
 
-      randomizeBtn.onclick = () => generateBoard(entries, shuffle(freeSpaces)[0]);
+      generateBoard(entries, freeSpaceEntry, seed);
+      updateNameLabel();
+
+      // shuffle and clear selection
+      randomizeBtn.onclick = () => {
+        const newSeed = generateSeed();
+        saveSeed(newSeed);
+        const newFreeSpaceEntry = seededShuffle(freeSpaces, newSeed)[0];
+        generateBoard(entries, newFreeSpaceEntry, newSeed);
+        clearSelection();
+        updateNameLabel();
+      };
     })
     .catch(error => {
       console.error("Error loading JSON files:", error);
@@ -224,9 +278,10 @@ function loadEntriesAndGenerate() {
 
 saveNameBtn.onclick = () => {
   const name = document.getElementById('nameInput').value.trim();
+  const seed = loadSeed();
   if (name) {
     nameInputArea.style.display = 'none'; // Hide the input field and button
-    nameLabel.textContent = `${name}'s Bingo Board`; // Update the name label
+    nameLabel.textContent = `${name}'s Bingo Board (Seed: ${seed})`; // Username and seed together
     nameLabel.style.color = 'lightgreen';
   } else {
     nameLabel.textContent = 'Please enter a name.';
@@ -255,4 +310,225 @@ privPolicyBtn.onclick = () => {
 PlugBtn.onclick = () => {
   window.open('https://www.twitch.tv/aonettv', '_blank'); // Open Twitch channel in a new tab
 }
+
+// Pop-out button functionality
+document.getElementById('popOutBtn').onclick = function() {
+  // Get the board HTML
+  const boardHTML = document.getElementById('bingoBoard').outerHTML;
+  const boardStyles = `
+    <style>
+      body {
+        background-color: #1e1e1e;
+        color: #dddddd;
+        font-family: Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .board {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+        width: 100%;
+        max-width: 90vmin;
+        height: auto;
+        max-height: 90vmin;
+        background: #23272e;
+        border: 3px solid #23272e;
+        border-radius: 16px;
+        padding: 20px;
+      }
+      .board button {
+        background-color: #333;
+        color: #fff;
+        border: none;
+        font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+        cursor: pointer;
+        aspect-ratio: 1 / 1;
+        width: 100%;
+        height: 100%;
+        font-family: inherit;
+        padding: 5px;
+        word-break: break-word;
+        white-space: normal;
+        text-align: center;
+        border-radius: 5px;
+        position: relative;
+      }
+      .board button.active {
+        background-color: green;
+      }
+      .board button:hover {
+        background-color: #555;
+      }
+    </style>
+  `;
+
+  // Open a new window and write the board HTML and styles
+  const popout = window.open('', 'BingoBoardPopout', 'width=500,height=600,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes');
+  popout.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Bingo Board Popout</title>
+      ${boardStyles}
+    </head>
+    <body>
+      ${boardHTML}
+      <script>
+  // Enable button toggling in the popout
+  const bingoBoard = document.getElementById('bingoBoard');
+  function saveBoardState() {
+    const buttons = Array.from(bingoBoard.children);
+    const state = buttons.map(btn => ({
+      clickCount: btn.dataset.clickCount,
+      active: btn.classList.contains('active')
+    }));
+    localStorage.setItem('bingoBoardState', JSON.stringify(state));
+  }
+  function loadBoardState() {
+    const state = JSON.parse(localStorage.getItem('bingoBoardState') || '[]');
+    const buttons = Array.from(bingoBoard.children);
+    state.forEach((btnState, i) => {
+      if (buttons[i]) {
+        buttons[i].dataset.clickCount = btnState.clickCount;
+        buttons[i].classList.toggle('active', btnState.active);
+        const counter = buttons[i].querySelector('span');
+        counter.textContent = btnState.clickCount > 0 ? btnState.clickCount : '';
+      }
+    });
+  }
+  Array.from(bingoBoard.children).forEach(button => {
+    const counter = button.querySelector('span');
+    button.onmousedown = (event) => {
+      let clickCount = parseInt(button.dataset.clickCount, 10) || 0;
+      if (event.button === 0) {
+        if (clickCount === 0) button.classList.add('active');
+        button.dataset.clickCount = clickCount + 1;
+        counter.textContent = clickCount + 1;
+      } else if (event.button === 2) {
+        if (clickCount > 0) {
+          button.dataset.clickCount = clickCount - 1;
+          counter.textContent = clickCount - 1 || '';
+          if (clickCount - 1 === 0) button.classList.remove('active');
+        }
+      }
+      saveBoardState();
+    };
+    button.oncontextmenu = (event) => event.preventDefault();
+  });
+  // Listen for storage events to sync state
+  window.addEventListener('storage', (event) => {
+    if (event.key === 'bingoBoardState') {
+      loadBoardState();
+    }
+  });
+  // Initial load
+  loadBoardState();
+<\/script>
+    </body>
+    </html>
+  `);
+  popout.document.close();
+};
+
+function saveBoardState() {
+  const buttons = Array.from(bingoBoard.children);
+  const state = buttons.map(btn => ({
+    clickCount: btn.dataset.clickCount,
+    active: btn.classList.contains('active')
+  }));
+  localStorage.setItem('bingoBoardState', JSON.stringify(state));
+}
+
+function loadBoardState() {
+  const state = JSON.parse(localStorage.getItem('bingoBoardState') || '[]');
+  const buttons = Array.from(bingoBoard.children);
+  state.forEach((btnState, i) => {
+    if (buttons[i]) {
+      buttons[i].dataset.clickCount = btnState.clickCount;
+      buttons[i].classList.toggle('active', btnState.active);
+      const counter = buttons[i].querySelector('span');
+      counter.textContent = btnState.clickCount > 0 ? btnState.clickCount : '';
+    }
+  });
+}
+
+// Initial load: check if there's a saved state and load it
+document.addEventListener('DOMContentLoaded', loadBoardState);
+
+window.addEventListener('storage', (event) => {
+  if (event.key === 'bingoBoardState') {
+    loadBoardState();
+    // Optionally, re-check for bingo
+    checkBingo();
+  }
+});
+
 loadEntriesAndGenerate();
+
+// Function to clear all selections on the board
+function clearSelection() {
+  const boardButtons = document.querySelectorAll('.board button');
+  boardButtons.forEach(btn => {
+    btn.classList.remove('active');
+    btn.dataset.clickCount = 0;
+    const counter = btn.querySelector('span');
+    if (counter) {
+      counter.textContent = '';
+    }
+  });
+  // Hide the Bingo label if shown
+  if (bingoLabel) bingoLabel.style.display = 'none';
+  saveBoardState();
+}
+
+// Save seed to localStorage
+function saveSeed(seed) {
+  localStorage.setItem('bingoSeed', seed);
+}
+
+// Load seed from localStorage
+function loadSeed() {
+  const s = localStorage.getItem('bingoSeed');
+  return s ? Number(s) : null;
+}
+
+const seedInput = document.getElementById('seedInput');
+const loadSeedBtn = document.getElementById('loadSeedBtn');
+loadSeedBtn.onclick = () => {
+  let newSeed = seedInput.value.trim();
+  if (!/^\d+$/.test(newSeed)) {
+    alert("Seed must be a number.");
+    return;
+  }
+  saveSeed(Number(newSeed));
+  loadEntriesAndGenerate();
+  updateNameLabel();
+};
+
+seedInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    loadSeedBtn.click();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', loadEntriesAndGenerate);
+
+// Update the name label based on the input
+function updateNameLabel() {
+  const name = document.getElementById('nameInput').value.trim();
+  const seed = loadSeed();
+  if (name) {
+    nameLabel.textContent = `${name}'s Bingo Board (Seed: ${seed})`;
+    nameLabel.style.color = 'lightgreen';
+  } else {
+    nameLabel.textContent = '';
+  }
+}
+

@@ -15,27 +15,30 @@
       color: #dddddd;
       font-family: Helvetica, Arial, sans-serif;
       margin: 0;
-      padding: 10px;
+      padding: 30px 20px 30px 20px; /* Increased padding for more space around everything */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       overflow: hidden;
+      box-sizing: border-box;
     }
 
     .board {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-      gap: 5px;
+      gap: 12px; /* Increased gap between board buttons */
       width: 100%;
       max-width: 90vmin;
       height: auto;
       max-height: 90vmin;
-      background: #23272e;           /* Subtle dark background */
-      border: 3px solid #23272e;        /* Slightly lighter border */
-      border-radius: 16px;           /* Rounded corners */
-      padding: 20px;                 /* Space inside the board */
+      background: #23272e;
+      border: 3px solid #23272e;
+      border-radius: 16px;
+      padding: 32px; /* More space inside the board */
+      margin: 30px 0 30px 0; /* More space above and below the board */
+      box-sizing: border-box;
     }
 
     .board button {
@@ -65,7 +68,8 @@
 
     .name-section {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 1px; /* More space below name section */
+      margin-top: 100px;    /* More space above name section */
     }
 
     #nameLabel {
@@ -78,7 +82,8 @@
       text-align: center;
       font-size: 1.5rem;
       color: gold;
-      margin-top: 15px;
+      margin-top: 1px; /* More space above Bingo label */
+      margin-bottom: 1px;
       display: none;
     }
 
@@ -100,7 +105,7 @@
       height: 100%;
       background-color: #2e2e2e;
       color: #fff;
-      padding: 15px;
+      padding: 25px; /* More space inside sidebar */
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
       z-index: 2000;
     }
@@ -127,12 +132,20 @@
       background-color: #444;
     }
 
-    #closeSidebarBtn, #randomizeBtn, #toggleSoundBtn, #privPolicyBtn, #PlugBtn {
+    #closeSidebarBtn, #randomizeBtn, #toggleSoundBtn, #privPolicyBtn, #PlugBtn, #popOutBtn, #seedBtn, #clearSelectionBtn, #seedInput, #loadSeedBtn {
       padding: 10px 15px;
       font-size: 0.9rem;
       width: 100%;
       margin-bottom: 10px;
       border-radius: 5px;
+      background-color: #2e2e2e;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    #closeSidebarBtn:hover, #randomizeBtn:hover, #toggleSoundBtn:hover, #privPolicyBtn:hover, #PlugBtn:hover, #popOutBtn:hover, #seedBtn:hover, #clearSelectionBtn:hover, #loadSeedBtn:hover {
+      background-color: #444;
     }
 
     #customCursor {
@@ -149,10 +162,12 @@
     /* Media Queries for Smaller Screens */
     @media (max-width: 768px) {
       body {
-        padding: 10px;
+        padding: 15px;
       }
       .board {
-        gap: 5px;
+        gap: 7px;
+        padding: 10px;
+        margin: 18px 0 18px 0;
       }
       .board button {
         font-size: 0.8rem;
@@ -172,7 +187,9 @@
     @media (max-width: 480px) {
       .board {
         grid-template-columns: repeat(3, 1fr); /* Adjust grid for very small screens */
-        gap: 3px;
+        gap: 4px;
+        padding: 8px;
+        margin: 10px 0 10px 0;
       }
       .board button {
         font-size: clamp(0.6rem, 2vw, 0.9rem);
@@ -189,21 +206,30 @@
   <!-- Sidebar -->
   <div id="sidebar">
     <button id="closeSidebarBtn">❌ Close Sidebar</button>
+      <div id="seedInputArea" style="margin-top:10px;">
+
+        <input type="text" id="seedInput" placeholder="Enter seed..." style="width:150px; ">
+        <button id="loadSeedBtn">Load Seed</button>
+      </div>
     <button id="randomizeBtn">🔄 Randomize Board</button>
+    <button id="clearSelectionBtn">🧹 Clear Selection</button>
     <button id="toggleSoundBtn">🔇 Enable Sounds</button>
-    <button id="privPolicyBtn">🔒 Privacy Policy</button>
-    <button id="PlugBtn">Follow A-1 on Twitch</button>
+    <button id="popOutBtn">🗗 Pop Out Board</button>
+    <button id="PlugBtn">📺 Follow A-1 on Twitch</button>
+        <button id="privPolicyBtn">🔒 Privacy Policy</button>
   </div>
   
   <!-- Open Sidebar Button -->
   <button id="openSidebarBtn">☰ Open Sidebar</button>
 
-  <!-- Bingo Label -->
-  <div id="bingoLabel">Bingo!</div>
+
 
   <!-- Name Input Area -->
   <div class="name-section">
-    <div id="timestamp" style="margin-bottom: 10px; color: #888; font-size: 14px;">Timestamp will appear here</div>
+    <div id="timestamp" style="margin-bottom: 10px; color: #888; font-size: 14px;">
+      Timestamp will appear here
+      <span id="seedLabel" style="margin-left: 16px; color: #aaa; font-size: 14px;"></span>
+    </div>
     <div id="nameInputArea">
       <h1>Enter your name <br> (Twitch or Discord):</h1>
       <input type="text" id="nameInput" placeholder="Enter name" />
@@ -211,6 +237,8 @@
     </div>
     <div id="nameLabel"></div>
   </div>
+    <!-- Bingo Label -->
+  <div id="bingoLabel">Bingo!</div>
 
   <!-- Bingo Board -->
   <div class="board" id="bingoBoard" style="grid-template-columns: repeat(5, 1fr);">

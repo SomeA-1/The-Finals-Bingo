@@ -1,0 +1,130 @@
+
+body {
+  background-color: #1e1e1e;
+  color: #dddddd;
+  font-family: Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 30px 20px 30px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 90vmin;
+  height: auto;
+  max-height: 90vmin;
+  background: #23272e;
+  border: 3px solid #23272e;
+  border-radius: 16px;
+  padding: 32px;
+  margin: 30px 0 30px 0;
+  box-sizing: border-box;
+}
+
+.board button {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  font-size: clamp(0.8rem, 2.5vw, 1.2rem);
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  padding: 5px;
+  word-break: break-word;
+  white-space: normal;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.board button:hover {
+  background-color: #1e1e1e;
+}
+
+.board button.active {
+  background-color: green;
+}
+
+.board button.active:hover {
+  background-color: rgb(35, 61, 4);
+}
+
+.name-section {
+  text-align: center;
+  margin-bottom: 1px;
+  margin-top: 100px;
+}
+
+#nameLabel {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: lightgreen;
+}
+
+#bingoLabel {
+  text-align: center;
+  font-size: 1.5rem;
+  color: gold;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  display: none;
+}
+
+.version {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.7rem;
+}
+
+
+/* Media Queries for Smaller Screens */
+@media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  .board {
+    gap: 7px;
+    padding: 10px;
+    margin: 18px 0 18px 0;
+  }
+  .board button {
+    font-size: 0.8rem;
+  }
+  #nameLabel {
+    font-size: 0.9rem;
+  }
+  #bingoLabel {
+    font-size: 1.3rem;
+  }
+  #openSidebarBtn {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .board {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 8px;
+    margin: 10px 0 10px 0;
+  }
+  .board button {
+    font-size: clamp(0.6rem, 2vw, 0.9rem);
+  }
+  #openSidebarBtn {
+    font-size: 0.7rem;
+    padding: 6px 10px;
+  }
+}

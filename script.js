@@ -203,7 +203,8 @@ function checkBingo() {
     bingoLabel.textContent = `${bingoCount} Bingos!`;
     bingoLabel.style.display = "block";
   } else {
-    bingoLabel.style.display = "none"; // Hide the label if no bingos
+    bingoLabel.textContent = "\u00A0"; // Show a non-breaking space if no bingos
+    bingoLabel.style.display = "block";
   }
 
   // Trigger confetti only if the bingo count increases
@@ -268,6 +269,16 @@ function loadEntriesAndGenerate() {
         generateBoard(entries, newFreeSpaceEntry, newSeed);
         clearSelection();
         updateNameLabel();
+        saveBoardState();
+
+        // Update popout with new board if open
+        if (popout && !popout.closed) {
+          popout.postMessage({
+            type: 'replaceBoard',
+            html: bingoBoard.outerHTML,
+            state: JSON.parse(localStorage.getItem('bingoBoardState') || '[]')
+          }, '*');
+        }
       };
     })
     .catch(error => {
@@ -280,12 +291,10 @@ saveNameBtn.onclick = () => {
   const name = document.getElementById('nameInput').value.trim();
   const seed = loadSeed();
   if (name) {
-    nameInputArea.style.display = 'none'; // Hide the input field and button
-    nameLabel.textContent = `${name}'s Bingo Board (Seed: ${seed})`; // Username and seed together
+    nameInputArea.style.display = 'none';
+    nameLabel.textContent = `${name}'s Bingo Board (Seed: ${seed})`;
     nameLabel.style.color = 'lightgreen';
-    // Save name to localStorage if desired
-    // localStorage.setItem('bingoName', name);
-    // Regenerate the board with the current entries and free space
+    localStorage.setItem('bingoName', name); // <-- Save to localStorage
     loadEntriesAndGenerate();
   } else {
     nameLabel.textContent = 'Please enter a name.';
@@ -443,6 +452,26 @@ document.getElementById('popOutBtn').onclick = function() {
               origin: { x: 0.5, y: 1 }
             });
           }
+          if (event.data === 'clearSelection') {
+            buttons.forEach(btn => {
+              btn.classList.remove('active');
+              btn.dataset.clickCount = 0;
+              const counter = btn.querySelector('span');
+              if (counter) counter.textContent = '';
+            });
+            saveBoardState();
+          }
+          if (event.data && event.data.type === 'updateBoardState' && Array.isArray(event.data.state)) {
+            event.data.state.forEach((btnState, i) => {
+              if (buttons[i]) {
+                buttons[i].dataset.clickCount = btnState.clickCount;
+                buttons[i].classList.toggle('active', btnState.active);
+                const counter = buttons[i].querySelector('span');
+                counter.textContent = btnState.clickCount > 0 ? btnState.clickCount : '';
+              }
+            });
+            saveBoardState();
+          }
         });
       <\/script>
     </body>
@@ -458,6 +487,11 @@ function saveBoardState() {
     active: btn.classList.contains('active')
   }));
   localStorage.setItem('bingoBoardState', JSON.stringify(state));
+
+  // Notify popout of the new state
+  if (popout && !popout.closed) {
+    popout.postMessage({ type: 'updateBoardState', state }, '*');
+  }
 }
 
 function loadBoardState() {
@@ -474,7 +508,15 @@ function loadBoardState() {
 }
 
 // Initial load: check if there's a saved state and load it
-document.addEventListener('DOMContentLoaded', loadBoardState);
+document.addEventListener('DOMContentLoaded', () => {
+  const savedName = localStorage.getItem('bingoName');
+  if (savedName) {
+    document.getElementById('nameInput').value = savedName;
+    nameInputArea.style.display = 'none';
+    updateNameLabel();
+  }
+  loadEntriesAndGenerate();
+});
 
 window.addEventListener('storage', (event) => {
   if (event.key === 'bingoBoardState') {
@@ -500,6 +542,11 @@ function clearSelection() {
   // Hide the Bingo label if shown
   if (bingoLabel) bingoLabel.style.display = 'none';
   saveBoardState();
+
+  // Notify popout to clear its selection
+  if (popout && !popout.closed) {
+    popout.postMessage('clearSelection', '*');
+  }
 }
 
 // Save seed to localStorage
@@ -536,7 +583,10 @@ document.addEventListener('DOMContentLoaded', loadEntriesAndGenerate);
 
 // Update the name label based on the input
 function updateNameLabel() {
-  const name = document.getElementById('nameInput').value.trim();
+  let name = document.getElementById('nameInput').value.trim();
+  if (!name) {
+    name = localStorage.getItem('bingoName') || '';
+  }
   const seed = loadSeed();
   if (name) {
     nameLabel.textContent = `${name}'s Bingo Board (Seed: ${seed})`;
@@ -548,4 +598,68 @@ function updateNameLabel() {
 
 // Add this if not already present
 document.getElementById('clearSelectionBtn').onclick = clearSelection;
+
+const clearNameBtn = document.getElementById('clearNameBtn');
+clearNameBtn.onclick = () => {
+  localStorage.removeItem('bingoName');
+  document.getElementById('nameInput').value = '';
+  nameInputArea.style.display = 'block';
+  nameLabel.textContent = '';
+};
+
+window.addEventListener('message', (event) => {
+  // ...existing handlers...
+
+  if (event.data && event.data.type === 'replaceBoard' && event.data.html) {
+    // Replace the board HTML
+    const temp = document.createElement('div');
+    temp.innerHTML = event.data.html;
+    const newBoard = temp.firstElementChild;
+    const oldBoard = document.getElementById('bingoBoard');
+    oldBoard.replaceWith(newBoard);
+
+    // Re-attach button handlers
+    const buttons = Array.from(newBoard.children);
+    buttons.forEach((button, idx) => {
+      const counter = button.querySelector('span');
+      button.onmousedown = (event) => {
+        let clickCount = parseInt(button.dataset.clickCount, 10) || 0;
+        if (event.button === 0) {
+          if (clickCount === 0) button.classList.add('active');
+          button.dataset.clickCount = clickCount + 1;
+          counter.textContent = clickCount + 1;
+        } else if (event.button === 2) {
+          if (clickCount > 0) {
+            button.dataset.clickCount = clickCount - 1;
+            counter.textContent = clickCount - 1 || '';
+            if (clickCount - 1 === 0) button.classList.remove('active');
+          }
+        }
+        saveBoardState();
+      };
+      button.oncontextmenu = (event) => event.preventDefault();
+    });
+
+    // Restore state
+    if (Array.isArray(event.data.state)) {
+      event.data.state.forEach((btnState, i) => {
+        if (buttons[i]) {
+          buttons[i].dataset.clickCount = btnState.clickCount;
+          buttons[i].classList.toggle('active', btnState.active);
+          const counter = buttons[i].querySelector('span');
+          counter.textContent = btnState.clickCount > 0 ? btnState.clickCount : '';
+        }
+      });
+    }
+
+    // Redefine saveBoardState for the new buttons
+    function saveBoardState() {
+      const state = buttons.map(btn => ({
+        clickCount: btn.dataset.clickCount,
+        active: btn.classList.contains('active')
+      }));
+      localStorage.setItem('bingoBoardState', JSON.stringify(state));
+    }
+  }
+});
 

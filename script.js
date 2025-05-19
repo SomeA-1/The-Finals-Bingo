@@ -219,20 +219,20 @@ function checkBingo() {
 }
 
 function launchConfetti() {
-  console.log("Confetti triggered!"); // Debugging
-  confetti({
-    particleCount: 500,
-    spread: 180,
-    gravity: 0.3,
-    scalar: 1.5,
-    ticks: 1000,
-    startVelocity: 60,
-    origin: {
-      x: 0.5,
-      // since they fall down, start a bit higher than random
-      y: 1,
-    }
-  });
+  if (popout && !popout.closed) {
+    popout.postMessage('launchConfetti', '*');
+  }
+  if (typeof confetti === 'function') {
+    confetti({
+      particleCount: 500,
+      spread: 180,
+      gravity: 0.3,
+      scalar: 1.5,
+      ticks: 1000,
+      startVelocity: 60,
+      origin: { x: 0.5, y: 1 }
+    });
+  }
 }
 
 function loadEntriesAndGenerate() {
@@ -315,10 +315,13 @@ PlugBtn.onclick = () => {
   window.open('https://www.twitch.tv/aonettv', '_blank'); // Open Twitch channel in a new tab
 }
 
+let popout = null;
+
 // Pop-out button functionality
 document.getElementById('popOutBtn').onclick = function() {
-  // Get the board HTML
+  // Get the board HTML and state
   const boardHTML = document.getElementById('bingoBoard').outerHTML;
+  const boardState = localStorage.getItem('bingoBoardState') || '[]';
   const boardStyles = `
     <style>
       body {
@@ -373,68 +376,75 @@ document.getElementById('popOutBtn').onclick = function() {
     </style>
   `;
 
-  // Open a new window and write the board HTML and styles
-  const popout = window.open('', 'BingoBoardPopout', 'width=500,height=600,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes');
+  popout = window.open('', 'BingoBoardPopout', 'width=500,height=600,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes');
   popout.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
       <title>Bingo Board Popout</title>
       ${boardStyles}
+      <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     </head>
     <body>
       ${boardHTML}
       <script>
-  // Enable button toggling in the popout
-  const bingoBoard = document.getElementById('bingoBoard');
-  function saveBoardState() {
-    const buttons = Array.from(bingoBoard.children);
-    const state = buttons.map(btn => ({
-      clickCount: btn.dataset.clickCount,
-      active: btn.classList.contains('active')
-    }));
-    localStorage.setItem('bingoBoardState', JSON.stringify(state));
-  }
-  function loadBoardState() {
-    const state = JSON.parse(localStorage.getItem('bingoBoardState') || '[]');
-    const buttons = Array.from(bingoBoard.children);
-    state.forEach((btnState, i) => {
-      if (buttons[i]) {
-        buttons[i].dataset.clickCount = btnState.clickCount;
-        buttons[i].classList.toggle('active', btnState.active);
-        const counter = buttons[i].querySelector('span');
-        counter.textContent = btnState.clickCount > 0 ? btnState.clickCount : '';
-      }
-    });
-  }
-  Array.from(bingoBoard.children).forEach(button => {
-    const counter = button.querySelector('span');
-    button.onmousedown = (event) => {
-      let clickCount = parseInt(button.dataset.clickCount, 10) || 0;
-      if (event.button === 0) {
-        if (clickCount === 0) button.classList.add('active');
-        button.dataset.clickCount = clickCount + 1;
-        counter.textContent = clickCount + 1;
-      } else if (event.button === 2) {
-        if (clickCount > 0) {
-          button.dataset.clickCount = clickCount - 1;
-          counter.textContent = clickCount - 1 || '';
-          if (clickCount - 1 === 0) button.classList.remove('active');
+        // Restore board state from main window
+        const boardState = ${boardState};
+        const bingoBoard = document.getElementById('bingoBoard');
+        const buttons = Array.from(bingoBoard.children);
+        boardState.forEach((btnState, i) => {
+          if (buttons[i]) {
+            buttons[i].dataset.clickCount = btnState.clickCount;
+            buttons[i].classList.toggle('active', btnState.active);
+            const counter = buttons[i].querySelector('span');
+            counter.textContent = btnState.clickCount > 0 ? btnState.clickCount : '';
+          }
+        });
+
+        // Make buttons interactive in popout
+        buttons.forEach((button, idx) => {
+          const counter = button.querySelector('span');
+          button.onmousedown = (event) => {
+            let clickCount = parseInt(button.dataset.clickCount, 10) || 0;
+            if (event.button === 0) {
+              if (clickCount === 0) button.classList.add('active');
+              button.dataset.clickCount = clickCount + 1;
+              counter.textContent = clickCount + 1;
+            } else if (event.button === 2) {
+              if (clickCount > 0) {
+                button.dataset.clickCount = clickCount - 1;
+                counter.textContent = clickCount - 1 || '';
+                if (clickCount - 1 === 0) button.classList.remove('active');
+              }
+            }
+            saveBoardState();
+          };
+          button.oncontextmenu = (event) => event.preventDefault();
+        });
+
+        function saveBoardState() {
+          const state = buttons.map(btn => ({
+            clickCount: btn.dataset.clickCount,
+            active: btn.classList.contains('active')
+          }));
+          localStorage.setItem('bingoBoardState', JSON.stringify(state));
         }
-      }
-      saveBoardState();
-    };
-    button.oncontextmenu = (event) => event.preventDefault();
-  });
-  // Listen for storage events to sync state
-  window.addEventListener('storage', (event) => {
-    if (event.key === 'bingoBoardState') {
-      loadBoardState();
-    }
-  });
-  // Initial load
-  loadBoardState();
-<\/script>
+
+        // Listen for confetti trigger from main window
+        window.addEventListener('message', (event) => {
+          if (event.data === 'launchConfetti' && window.confetti) {
+            window.confetti({
+              particleCount: 500,
+              spread: 180,
+              gravity: 0.3,
+              scalar: 1.5,
+              ticks: 1000,
+              startVelocity: 60,
+              origin: { x: 0.5, y: 1 }
+            });
+          }
+        });
+      <\/script>
     </body>
     </html>
   `);

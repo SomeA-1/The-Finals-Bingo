@@ -283,6 +283,10 @@ saveNameBtn.onclick = () => {
     nameInputArea.style.display = 'none'; // Hide the input field and button
     nameLabel.textContent = `${name}'s Bingo Board (Seed: ${seed})`; // Username and seed together
     nameLabel.style.color = 'lightgreen';
+    // Save name to localStorage if desired
+    // localStorage.setItem('bingoName', name);
+    // Regenerate the board with the current entries and free space
+    loadEntriesAndGenerate();
   } else {
     nameLabel.textContent = 'Please enter a name.';
     nameLabel.style.color = 'red';
@@ -531,4 +535,7 @@ function updateNameLabel() {
     nameLabel.textContent = '';
   }
 }
+
+// Add this if not already present
+document.getElementById('clearSelectionBtn').onclick = clearSelection;
 

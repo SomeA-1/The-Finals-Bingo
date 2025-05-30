@@ -55,13 +55,30 @@ body {
 }
 
 .board button.active {
-  background-color: green;
+  background: green;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
 }
 
-.board button.active:hover {
-  background-color: rgb(35, 61, 4);
+.board button.bingo {
+  background: none;
+  animation: bingoColorCycle 10s linear infinite;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
 }
 
+@keyframes bingoColorCycle {
+  0%   { background-color: red; }
+  14%  { background-color: orange; }
+  28%  { background-color: yellow; }
+  42%  { background-color: green; }
+  57%  { background-color: blue; }
+  71%  { background-color: indigo; }
+  85%  { background-color: violet; }
+  100% { background-color: red; }
+}
 .name-section {
   text-align: center;
   margin-bottom: 1px;

@@ -166,28 +166,42 @@ function checkBingo() {
   while (buttons.length) grid.push(buttons.splice(0, 5));
 
   let bingoCount = 0;
+  let bingoIndexes = new Set();
 
   // Check rows
-  for (const row of grid) {
-    if (row.every(button => button.classList.contains('active'))) {
+  for (let r = 0; r < grid.length; r++) {
+    if (grid[r].every(button => button.classList.contains('active'))) {
       bingoCount++;
+      for (let c = 0; c < 5; c++) bingoIndexes.add(r * 5 + c);
     }
   }
 
   // Check columns
   for (let col = 0; col < 5; col++) {
     if (grid.every(row => row[col].classList.contains('active'))) {
+      for (let row = 0; row < 5; row++) bingoIndexes.add(row * 5 + col);
       bingoCount++;
     }
   }
 
   // Check diagonals
   if (grid.every((row, i) => row[i].classList.contains('active'))) {
+    for (let i = 0; i < 5; i++) bingoIndexes.add(i * 5 + i);
     bingoCount++;
   }
   if (grid.every((row, i) => row[4 - i].classList.contains('active'))) {
+    for (let i = 0; i < 5; i++) bingoIndexes.add(i * 5 + (4 - i));
     bingoCount++;
   }
+
+  // Remove .bingo from all buttons first
+  const allButtons = Array.from(bingoBoard.children);
+  allButtons.forEach(btn => btn.classList.remove('bingo'));
+
+  // Add .bingo to buttons that are part of a bingo
+  bingoIndexes.forEach(idx => {
+    if (allButtons[idx]) allButtons[idx].classList.add('bingo');
+  });
 
   // Update the Bingo label based on the count
   if (bingoCount === 1) {

@@ -326,7 +326,7 @@ document.getElementById('nameInput').addEventListener('keydown', (event) => {
 toggleSoundBtn.onclick = () => {
   soundsEnabled = !soundsEnabled; // Toggle the soundsEnabled variable
   console.log(`Sounds Enabled: ${soundsEnabled}`); // Debugging
-  toggleSoundBtn.textContent = soundsEnabled ? "🔊 Disable Sounds" : "🔇 Enable Sounds"; // Update button text
+  toggleSoundBtn.textContent = soundsEnabled ? "🔇 Disable Sounds" : "🔊 Enable Sounds"; // Update button text
 };
 //open privacy policy in a new tab
 privPolicyBtn.onclick = () => {

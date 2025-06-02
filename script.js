@@ -41,7 +41,7 @@ const checkSound = new Audio('sounds/check.mp3'); // Sound for checking
 const uncheckSound = new Audio('sounds/uncheck.mp3'); // Sound for unchecking
 const confettiSound = new Audio('sounds/confetti.mp3'); // Sound for confetti
 
-let soundsEnabled = false; // Variable to track if sounds are enabled
+let soundsEnabled = true; // Variable to track if sounds are enabled
 
 function shuffle(array) {
   const newArr = array.slice();

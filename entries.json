@@ -10,12 +10,17 @@
   "Jinko gets recognized",
   "Jinko does the chat voice",
   "Jinko asks mods something",
-  "Jinko dies after respawning",
-  "Jinko wrongfully blames teammate",
+  "Jinko lost chat context",
+  "Jinko is the last death",
+  "Lag icon appears",
+  "Jinko sabotages teammate",
+  "Jinko can't find bingo square",
+  "Jinko blames teammate",
   "Single-color stats",
   "Random Riot Shield user",
   "Literally 1 HP",
-  "Queue sniper",
+  "Jinko knows enemy player",
+  "Death by deployable",
   "Goo issue",
   "'smh my head'",
   "Dies reading chat",
@@ -40,5 +45,5 @@
   "One team gets STOMPED",
   "Post-mortem kill",
   "Weird Jinko noises",
-  "Oscar is online"
+  "Embarker is online"
 ]

@@ -8,17 +8,15 @@
   "Jinko screams",
   "Jinko crashout",
   "Jinko gets recognized",
-  "Jinko does a funny voice",
+  "Jinko does the chat voice",
   "Jinko asks mods something",
   "Jinko lost chat context",
-  "Jinko is last kill or death",
   "Jinko knows enemy player",
   "Jinko blames teammate",
   "Jinko sabotages teammate",
-  "Jinko can't find bingo square",
-  "Lag icons",
-  "Single-color stats",
+  "Lag icon",
   "Random Riot Shield user",
+  "Random Dual Blades user",
   "Literally 1 HP",
   "Death by deployable",
   "Goo issue",
@@ -46,5 +44,6 @@
   "Weird Jinko noises",
   "Embarker is online",
   "jinko sneezes",
-  "monaco"
+  "monaco",
+  "solo wipe"
 ]
